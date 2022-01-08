@@ -237,6 +237,11 @@ public:
                 {
                     this->Sort_Help(containsVertex(this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName()), visited, stack);
                 }
+                else
+                {
+                    cout << "Graph Has Cycles!" << endl;
+                    exit(0);
+                }
             }
         }
         stack->Prepend(this->VertexList->Get(p)->ReturnName());
