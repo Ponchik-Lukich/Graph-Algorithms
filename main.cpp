@@ -167,7 +167,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
             {
                 for (int i = 0; i < Path1->GetSize()-1; i++)
                 {
-                    if (graph->containsEdge(Path1->Get(i), Path1->Get(i+1)) && graph->ReturnEdges()->Get(graph->containsEdge(Path1->Get(i), Path1->Get(i+1)))->ReturnWeight() < weight)
+                    if (graph->containsEdge(Path1->Get(i), Path1->Get(i+1)) != -1 && graph->ReturnEdges()->Get(graph->containsEdge(Path1->Get(i), Path1->Get(i+1)))->ReturnWeight() < weight)
                     {
                         weight = graph->ReturnEdges()->Get(graph->containsEdge(Path1->Get(i), Path1->Get(i+1)))->ReturnWeight();
                     }

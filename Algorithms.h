@@ -1,6 +1,7 @@
 #ifndef LAB3_ALGORITHMS_H
 #define LAB3_ALGORITHMS_H
 #include "Graph.h"
+#include "Function.h"
 #include "UndirGraph.h"
 
 
@@ -135,7 +136,6 @@ namespace algorithms
     template <class Name, class Weight>
     ArraySequence<Name>* Bandwidth(Name first_one, Name last_one, Graph<Name, Weight>* graph, int (*cmp)(Name, Name))
     {
-        int start, end, result;
         Weight temp;
         ArraySequence<Name>* Path = new ArraySequence<Name>();
         ArraySequence<Weight>* weights = new ArraySequence<Weight>();
@@ -165,7 +165,7 @@ namespace algorithms
             d = d / 2;
         }
 
-        for (int i = weights->GetSize()-1; i; i--)
+        for (int i = weights->GetSize()-1; i >= 0; i--)
         {
 
             Graph<Name, Weight>* graph1 = new Graph<Name, Weight>(compareT1);
