@@ -1,0 +1,20 @@
+digraph G{
+node [style=filled, colorscheme=spectral11];
+"A";
+"B";
+"C";
+"D";
+"E";
+"F";
+"G";
+"H";
+"B"->"H"[label=14];
+"H"->"F"[label=77];
+"F"->"C"[label=10];
+"A"->"G"[label=73];
+"F"->"E"[label=8];
+"F"->"B"[label=77];
+"D"->"B"[label=23];
+"A"->"F"[label=20];
+}
+

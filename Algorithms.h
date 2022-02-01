@@ -9,7 +9,7 @@
 namespace algorithms
 {
     template <class Name, class Weight>
-    ArraySequence<int>* Dijkstra(Name first_one, Name last_one, Graph<Name, Weight>* graph, int (*cmp)(Name, Name))
+    ArraySequence<int>* Dijkstra(Name first_one, Name last_one, Graph<Name, Weight>* graph, int (*cmp)(Weight, Weight))
     {
         int min;
         CommonMatrix<Weight>* matrix = graph->AdjMatrix();
@@ -28,7 +28,7 @@ namespace algorithms
 
         for (int i = 0; i < graph->ReturnVertexNumber(); i++)
         {
-            Path.Set(i, 10000);
+            Path.Set(i, 1000000);
             Marked.Set(i, false);
         }
         Path.Set(start, 0);
@@ -36,7 +36,7 @@ namespace algorithms
         for (int i = 0; i < graph->ReturnVertexNumber(); i++)
         {
             Marked.Set(temp, true);
-            min = 10000;
+            min = 1000000;
             for (int j = 0; j < graph->ReturnVertexNumber(); j++)
             {
                 if ((j != temp) && cmp((matrix->GetElement(temp, j) + Path.Get(temp)), Path.Get(j)) == 0)
@@ -49,7 +49,7 @@ namespace algorithms
                     min = Path.Get(j);
                 }
             }
-            if (min == 10000)
+            if (min == 1000000)
             {
                 break;
             }
@@ -60,7 +60,7 @@ namespace algorithms
         }
 
         int weight = Path.Get(end);
-        if (weight == 10000)
+        if (weight == 1000000)
         {
             Parent->Append(-1);
             return Parent;
@@ -86,28 +86,29 @@ namespace algorithms
     }
 
     template <class Name, class Weight>
-    ArraySequence<int> Coloring(UndGraph<Name, Weight>* graph, int (*cmp)(Name, Name))
+    ArraySequence<int>* Coloring(UndGraph<Name, Weight>* graph, int (*cmp)(Name, Name))
     {
         graph->EdgeNumSort();
+
         int next = 0;
         int num = 1;
-        ArraySequence<int> Color(graph->ReturnVertexNumber());
+        ArraySequence<int>* Color= new ArraySequence<int>();
         ArraySequence<int> Marked(graph->ReturnVertexNumber());
         for(int i = 0; i < graph->ReturnVertexNumber(); i += 1)
         {
-            Color.Set(i, -1);
+            Color->Append( -1);
             Marked.Set(i, 0);
         }
         for(int i = 0; i < graph->ReturnVertexNumber(); i += 1)
         {
-            if (Color.Get(i) == -1)
+            if (Color->Get(i) == -1)
             {
 
                 for(int j = 0; j < graph->ReturnVertexNumber(); j += 1)
                 {
                     for(int k = 0; k < graph->ReturnEdgeNumber(); k += 1)
                     {
-                        if (cmp(graph->ReturnEdges()->Get(k)->GetFirst()->ReturnName(), graph->ReturnVertexes()->Get(j)->ReturnName()) == 2 && Marked.Get(j) == 0 && Color.Get(j)==-1)
+                        if (graph->ReturnEdges()->Get(k)->GetFirst()->ReturnName() == graph->ReturnVertexes()->Get(j)->ReturnName() && Marked.Get(j) == 0 && Color->Get(j)==-1)
                         {
                             Marked.Set(graph->containsVertex(graph->ReturnEdges()->Get(k)->GetSecond()->ReturnName()),1);
                         }
@@ -115,9 +116,9 @@ namespace algorithms
                 }
                 for (int z = 0; z < graph->ReturnVertexNumber(); z += 1)
                 {
-                    if (Marked.Get(z) == 0)
+                    if (Marked.Get(z) == 0 && Color->Get(z) == -1)
                     {
-                        Color.Set(z, num);
+                        Color->Set(z, num);
                         next = 1;
                     }
                     Marked.Set(z, 0);
@@ -134,10 +135,11 @@ namespace algorithms
     }
 
     template <class Name, class Weight>
-    ArraySequence<Name>* Bandwidth(Name first_one, Name last_one, Graph<Name, Weight>* graph, int (*cmp)(Name, Name))
+    ArraySequence<int>* Bandwidth(Name first_one, Name last_one, Graph<Name, Weight>* graph, int (*cmp)(Weight, Weight))
     {
         Weight temp;
         ArraySequence<Name>* Path = new ArraySequence<Name>();
+        ArraySequence<int>* IPath = new ArraySequence<int>();
         ArraySequence<Weight>* weights = new ArraySequence<Weight>();
 
         for (int i = 0; i < graph->ReturnEdgeNumber(); i += 1)
@@ -183,15 +185,16 @@ namespace algorithms
                 for (int k = 0; k < Dij->GetSize(); k++)
                 {
                     Path->Append(graph1->ReturnVertexes()->Get(Dij->Get(k))->ReturnName());
+                    IPath->Append(graph->containsVertex(graph1->ReturnVertexes()->Get(Dij->Get(k))->ReturnName()));
                 }
                 delete(graph1);
-                return Path;
+                return IPath;
             }
             delete(graph1);
 
         }
-        Path->Append(-1);
-        return Path;
+        IPath->Append(-1);
+        return IPath;
     }
 
 

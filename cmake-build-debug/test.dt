@@ -1,0 +1,39 @@
+digraph G{
+node [style=filled, colorscheme=set312];
+"D"[fillcolor=1, color = black];
+"M"[fillcolor=1, color = black];
+"H"[fillcolor=2, color = black];
+"K"[fillcolor=3, color = black];
+"B"[fillcolor=2, color = black];
+"F"[fillcolor=2, color = black];
+"L"[fillcolor=3, color = black];
+"A"[fillcolor=2, color = black];
+"E"[fillcolor=1, color = black];
+"I"[fillcolor=2, color = black];
+"N"[fillcolor=3, color = black];
+"O"[fillcolor=2, color = black];
+"C"[fillcolor=1, color = black];
+"G"[fillcolor=2, color = black];
+"J"[fillcolor=1, color = black];
+"N"->"F"[label=82, dir=none];
+"M"->"F"[label=86, dir=none];
+"O"->"D"[label=36, dir=none];
+"B"->"D"[label=74, dir=none];
+"K"->"O"[label=94, dir=none];
+"A"->"L"[label=87, dir=none];
+"H"->"K"[label=16, dir=none];
+"B"->"C"[label=28, dir=none];
+"D"->"H"[label=68, dir=none];
+"M"->"A"[label=71, dir=none];
+"J"->"F"[label=10, dir=none];
+"K"->"M"[label=22, dir=none];
+"N"->"M"[label=43, dir=none];
+"H"->"L"[label=22, dir=none];
+"M"->"G"[label=50, dir=none];
+"D"->"L"[label=16, dir=none];
+"E"->"H"[label=65, dir=none];
+"I"->"K"[label=27, dir=none];
+"B"->"E"[label=92, dir=none];
+"D"->"I"[label=33, dir=none];
+}
+

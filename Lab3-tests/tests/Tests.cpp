@@ -223,10 +223,10 @@ TEST(DirectedGraph, ADJMatrix)
     ASSERT_EQ(0, matrix->GetElement(2,2));
     ASSERT_EQ(1, matrix->GetElement(0,1));
     ASSERT_EQ(4, matrix->GetElement(0,2));
-    ASSERT_EQ(10000, matrix->GetElement(1,0));
+    ASSERT_EQ(1000000, matrix->GetElement(1,0));
     ASSERT_EQ(2, matrix->GetElement(1,2));
-    ASSERT_EQ(10000, matrix->GetElement(2,0));
-    ASSERT_EQ(10000, matrix->GetElement(2,1));
+    ASSERT_EQ(1000000, matrix->GetElement(2,0));
+    ASSERT_EQ(1000000, matrix->GetElement(2,1));
 
 }
 
@@ -255,6 +255,9 @@ TEST(DirectedGraph, Dijkstra)
 TEST(DirectedGraph, TopologicalSort)
 {
     graph->DeleteEdge('B', 'C');
+    graph->DeleteEdge('G', 'A');
+    graph->DeleteEdge('C', 'G');
+    graph->DeleteEdge('C', 'D');
     graph->TopologicalSort();
 
     ASSERT_EQ('A', graph->ReturnVertexes()->Get(0)->ReturnName());
@@ -269,7 +272,6 @@ TEST(DirectedGraph, TopologicalSort)
 
 TEST(UndirectedGraph, Add_Edge_Vertex)
 {
-
     graph1->AddVertex('A');
     graph1->AddVertex('B');
     graph1->AddEdge('B', 'C', 1);
@@ -278,7 +280,6 @@ TEST(UndirectedGraph, Add_Edge_Vertex)
     ASSERT_EQ(2,graph1->containsVertex('C'));
     ASSERT_EQ(3, graph1->ReturnVertexNumber());
     ASSERT_EQ(2, graph1->ReturnEdgeNumber());
-
 }
 
 TEST(UndirectedGraph, Delete_Edge_Vertex)
@@ -337,7 +338,7 @@ TEST(UndirectedGraph, Dijkstra)
 
 TEST(UndirectedGraph, Coloring)
 {
-    ArraySequence<int> Colors = Coloring(graph1, compareT1);
+    ArraySequence<int>* Colors = Coloring(graph1, compareT1);
 
     ASSERT_EQ(0,graph1->containsVertex('C'));
     ASSERT_EQ(1, graph1->containsVertex('A'));
@@ -345,11 +346,11 @@ TEST(UndirectedGraph, Coloring)
     ASSERT_EQ(3,graph1->containsVertex('G'));
     ASSERT_EQ(4, graph1->containsVertex('B'));
     ASSERT_EQ(5, graph1->containsVertex('E'));
-    ASSERT_EQ(1, Colors.Get(0));
-    ASSERT_EQ(2,Colors.Get(1));
-    ASSERT_EQ(2,Colors.Get(2));
-    ASSERT_EQ(3,Colors.Get(3));
-    ASSERT_EQ(3,Colors.Get(4));
-    ASSERT_EQ(3,Colors.Get(5));
+    ASSERT_EQ(1, Colors->Get(0));
+    ASSERT_EQ(2,Colors->Get(1));
+    ASSERT_EQ(2,Colors->Get(2));
+    ASSERT_EQ(3,Colors->Get(3));
+    ASSERT_EQ(3,Colors->Get(4));
+    ASSERT_EQ(3,Colors->Get(5));
 
 }

@@ -2,13 +2,23 @@
 #include "ListSequence.h"
 #include "LinkedList.h"
 #include "Sequence.h"
-#include "Pair.h"
 #include "Matrix.h"
+#include <ctime>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <iostream>
 
 #define NO_ELEMENT "NO ELEMENT WITH GIVEN KEY"
+
+static char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                                'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+                                'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+                                'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+                                'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                                'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+                                'w', 'x', 'y', 'z', '0', '1', '2', '3',
+                                '4', '5', '6', '7', '8', '9'};
 
 template <class Name, class Weight>
 class Graph
@@ -199,7 +209,7 @@ public:
         {
             for (int j = 0; j < this -> ReturnVertexNumber(); ++j)
             {
-                matrix->SetElement(i, j, 10000);
+                matrix->SetElement(i, j, 1000000);
             }
         }
 
@@ -209,10 +219,10 @@ public:
             int second = 0;
             for (int j = 0; j < this -> ReturnVertexNumber(); ++j)
             {
-                if (cmp(this -> EdgeList -> Get(i)-> GetFirst() -> ReturnName(), VertexList -> Get(j) -> ReturnName()) == 2)  first = j;
-                if (cmp(this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName(), VertexList -> Get(j) -> ReturnName()) == 2)  second = j;
+                if ((this -> EdgeList -> Get(i)-> GetFirst() -> ReturnName() == VertexList -> Get(j) -> ReturnName()))  first = j;
+                if ((this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName() == VertexList -> Get(j) -> ReturnName()))  second = j;
             }
-            if (cmp(matrix->GetElement(first, second), this -> EdgeList -> Get(i) -> ReturnWeight()) == 1)
+            if ((matrix->GetElement(first, second) > this -> EdgeList -> Get(i) -> ReturnWeight()))
             {
                 matrix->SetElement(first, second, this -> EdgeList -> Get(i) -> ReturnWeight());
             }
@@ -237,14 +247,28 @@ public:
                 {
                     this->Sort_Help(containsVertex(this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName()), visited, stack);
                 }
-                else
-                {
-                    cout << "Graph Has Cycles!" << endl;
-                    exit(0);
-                }
             }
         }
         stack->Prepend(this->VertexList->Get(p)->ReturnName());
+    }
+
+    void cycleCheck(int p, int z)
+    {
+        for (int i = 0; i < this->ReturnEdgeNumber(); i++)
+        {
+            if(cmp(this -> EdgeList -> Get(i)-> GetFirst() -> ReturnName(), this -> VertexList->Get(p)->ReturnName()) == 2)
+            {
+                if (cmp(this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName(), this -> VertexList->Get(z)->ReturnName()) == 2)
+                {
+                    cout << "Graph has Cycles!" << endl;
+                    exit(0);
+                }
+                else
+                {
+                    cycleCheck(containsVertex(this -> EdgeList -> Get(i)-> GetSecond() -> ReturnName()),z);
+                }
+            }
+        }
     }
 
     virtual void TopologicalSort()
@@ -254,6 +278,10 @@ public:
         for (int i = 0; i < this->ReturnVertexNumber(); i++)
         {
             visited[i] = false;
+        }
+        for (int i = 0; i < this->ReturnVertexNumber(); ++i)
+        {
+            cycleCheck(i, i);
         }
         for (int i = 0; i < this->ReturnVertexNumber(); ++i)
         {
@@ -309,7 +337,179 @@ public:
         }
     }
 
+    virtual void RandomGraph(int Vnum, int Enum, int type)
+    {
+        int max;
+        if (type == 1)
+        {
+            max = Vnum*(Vnum-1);
+        }
+        else
+        {
+            max = Vnum*(Vnum-1)/2;
+        }
+        if (Enum > max || Enum < 1 || Vnum > 61 || Vnum < 2)
+        {
+            cout << "Cant Do That!" << endl;
+            exit(0);
+        }
+        for (int i = 0; i < Vnum; ++i)
+        {
+            this->AddVertex(encoding_table[i]);
+        }
 
+        if ( Enum == max)
+        {
+            for (int i = 0; i < this->ReturnVertexNumber(); ++i)
+            {
+                for (int j = 0; j < this->ReturnVertexNumber(); ++j)
+                {
+                    if (this->VertexList->Get(i) != this->VertexList->Get(j))
+                    {
+                        this->AddEdge(this->VertexList->Get(i)->ReturnName(), this->VertexList->Get(j)->ReturnName(), 1 + rand() % 100);
+                    }
+                }
+            }
+        }
+        else
+        {
+            srand( time( 0 ) );
+            int border = this->ReturnVertexNumber();
+            while (Enum > 0)
+            {
+                int RandN1 = rand() % border ;
+                int RandN2 = rand() % border ;
+                if (this->containsEdge(this->VertexList->Get(RandN1)->ReturnName(), this->VertexList->Get(RandN2)->ReturnName()) == -1 && (RandN1 != RandN2))
+                {
+                    this ->AddEdge(this->VertexList->Get(RandN1)->ReturnName(), this->VertexList->Get(RandN2)->ReturnName(), 1 + rand() % 100);
+                    --Enum;
+                }
+            }
+        }
+
+    }
+
+    string Tostring(int type)
+    {
+        stringstream ss;
+        string defaultColor = "grey";
+        ss << ("digraph G") << "{" << endl;
+        ss << "node [style=filled, colorscheme=spectral11];" << endl;
+        for (int i = 0; i < this->ReturnVertexNumber(); i ++)
+        {
+            ss << '"' << this->VertexList->Get(i)->ReturnName() << '"' << ';' << endl;
+        }
+        for (int i = 0; i < this->ReturnEdgeNumber(); i ++)
+        {
+            if (type == 1)
+            {
+                ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight() <<"];" << endl;
+            }
+            else
+            {
+                if (i % 2 == 1)
+                {
+                    ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight()<<", dir=none" <<"];" << endl;
+                }
+            }
+
+
+        }
+        ss << '}' << endl;
+        return ss.str();
+    };
+
+    string PathColorTostring(int type, ArraySequence<int>* array, int operation)
+    {
+        stringstream ss;
+        int stopper;
+        string defaultColor = "grey";
+        ss << ("digraph G") << "{" << endl;
+        ss << "node [style=filled, colorscheme=set312];" << endl;
+
+        if (operation == 1)
+        {
+            for (int i = 0; i < array->GetSize(); i++)
+            {
+                ss << '"' << this->VertexList->Get(array->Get(i))->ReturnName() << '"' << "[color=4, fillcolor=9];" << endl;
+            }
+        }
+        for (int i = 0; i < this->ReturnVertexNumber(); i ++)
+        {
+            if (operation == 2)
+            {
+                ss << '"' << this->VertexList->Get(i)->ReturnName() << '"' <<'['<<"fillcolor=" << array->Get(i) << ", color = black];" << endl;
+            }
+            else
+            {
+                ss << '"' << this->VertexList->Get(i)->ReturnName() << '"' << ';' << endl;
+            }
+        }
+
+        if (type == 1)
+        {
+            for (int i = 0; i < this->ReturnEdgeNumber(); i++)
+            {
+                if (operation == 1)
+                {
+                    for (int j = 0; j < array->GetSize()-1;j++)
+                    {
+                        stopper = 0;
+                        if (this->EdgeList->Get(i)->GetFirst()->ReturnName() == this->VertexList->Get(array->Get(j))->ReturnName() && this->EdgeList->Get(i)->GetSecond()->ReturnName() == this->VertexList->Get(array->Get(j+1))->ReturnName())
+                        {
+                            ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"color = red, label=<<font color=\"red\">"<< this->EdgeList->Get(i)->ReturnWeight() <<"</font>>];" << endl;
+                            stopper = 1;
+                            break;
+                        }
+                    }
+                    if (stopper == 0)
+                    {
+                        ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight() <<"];" << endl;
+                    }
+
+                }
+                else
+                {
+                    ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight() <<"];" << endl;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < this->ReturnEdgeNumber(); i++)
+            {
+                if (i % 2 == 1)
+                {
+                    if (operation == 1)
+                    {
+                        for (int j = 0; j < array->GetSize()-1;j++)
+                        {
+                            stopper = 0;
+                            if (this->EdgeList->Get(i)->GetFirst()->ReturnName() == this->VertexList->Get(array->Get(j))->ReturnName() && this->EdgeList->Get(i)->GetSecond()->ReturnName() == this->VertexList->Get(array->Get(j+1))->ReturnName())
+                            {
+                                ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"color = red, dir = none, label=<<font color=\"red\">"<< this->EdgeList->Get(i)->ReturnWeight() <<"</font>>];" << endl;
+                                stopper = 1;
+                                break;
+                            }
+                        }
+                        if (stopper == 0)
+                        {
+                            ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight()<<", dir=none" <<"];" << endl;
+                        }
+
+                    }
+                    else
+                    {
+                        ss << '"' << this->EdgeList->Get(i)->GetFirst()->ReturnName() << '"' << "->" << '"' << this->EdgeList->Get(i)->GetSecond()->ReturnName() << '"' <<'['<<"label="<< this->EdgeList->Get(i)->ReturnWeight()<<", dir=none" <<"];" << endl;
+                    }
+                }
+            }
+        }
+        ss << '}' << endl;
+        return ss.str();
+    };
+
+    ~Graph() = default;
 
 private:
     ListSequence<Vertex<Name>*>* VertexList;

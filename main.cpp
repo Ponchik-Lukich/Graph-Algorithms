@@ -2,7 +2,8 @@
 #include "Graph.h"
 #include "Function.h"
 #include "Algorithms.h"
-#include "UndirGraph.h"
+#include "CUtils.h"
+#include <fstream>
 using namespace algorithms;
 
 const string WhatNameV = "Enter Vertex Name: ";
@@ -11,6 +12,12 @@ const string WhatNameE2 = "Enter End Vertex Name: ";
 const string WhatNameE3 = "Enter Weight: ";
 const string Shortest = "The Shortest Path: ";
 
+void Random()
+{
+    cout << ("Make random graph?") << endl;
+    cout << ("1 <- Yes") << endl;
+    cout << ("O <- No") << endl;
+}
 
 void ChooseRealization()
 {
@@ -43,14 +50,31 @@ void ChooseDeleteFunction()
     cout << ("2 <- Delete Edge") << endl;
     cout << ("0 <- Go back") << endl;
 }
+void GraphPic(string Picture)
+{
+    ofstream outfile ("test.dt");
+    outfile << Picture << endl;
+    outfile.close();
+    CUtils::RunProcess("dot.exe -Tjpg -O test.dt ");
+
+    CUtils::RunProcess("move test.dt.jpg ../graph.jpg");
+}
 
 template <class Name, class Weight>
-void Actions(int action, Graph<Name, Weight>* graph)
+void UpdatePic(Graph<Name, Weight>* graph, int type)
+{
+    string Update = graph->Tostring(type);
+    GraphPic(Update);
+}
+
+template <class Name, class Weight>
+void Actions(int action, Graph<Name, Weight>* graph, int type)
 {
     int choice, weight;
     char start, end, name, name1;
+    string DijString;
     ArraySequence<int>* Path;
-    ArraySequence<char>* Path1;
+    ArraySequence<int>* Path1;
     switch (action)
     {
         default:
@@ -67,6 +91,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                     cin >> name;
                     cout << endl;
                     graph->AddVertex(name);
+                    UpdatePic(graph, type);
                 }
                 else if (choice == 2)
                 {
@@ -80,7 +105,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                     cin >> weight;
                     cout << endl;
                     graph->AddEdge(name, name1, weight);
-
+                    UpdatePic(graph, type);
                 }
                 else
                 {
@@ -100,6 +125,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                     cin >> name;
                     cout << endl;
                     graph->DeleteVertex(name);
+                    UpdatePic(graph, type);
                 }
                 else if (choice == 2)
                 {
@@ -110,6 +136,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                     cin >> name1;
                     cout << endl;
                     graph->DeleteEdge(name, name1);
+                    UpdatePic(graph, type);
                 }
                 else
                 {
@@ -122,7 +149,6 @@ void Actions(int action, Graph<Name, Weight>* graph)
             weight = 0;
             cout << WhatNameE1;
             cin >> start;
-            cout << endl;
             cout << WhatNameE2;
             cin >> end;
             cout << endl;
@@ -132,6 +158,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                 if (Path->Get(0) == -1)
                 {
                     cout << "This Path Doesnt Exist!" << endl;
+                    exit(0);
                 }
                 cout << Shortest << endl;
                 for(int i = 0; i < Path->GetSize()-1; i += 1)
@@ -143,6 +170,9 @@ void Actions(int action, Graph<Name, Weight>* graph)
                 }
                 cout << graph->ReturnVertexes()->Get(Path->Get(Path->GetSize()-1))->ReturnName() << endl;
                 cout << "The Weight is:  " << weight << endl;
+                cout << endl;
+                DijString = graph->PathColorTostring(type, Path, 1);
+                GraphPic(DijString);
             }
             else
             {
@@ -151,7 +181,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
             break;
 
         case 5:
-            weight = 10000;
+            weight = 1000000;
             cout << WhatNameE1;
             cin >> start;
             cout << endl;
@@ -167,14 +197,17 @@ void Actions(int action, Graph<Name, Weight>* graph)
             {
                 for (int i = 0; i < Path1->GetSize()-1; i++)
                 {
-                    if (graph->containsEdge(Path1->Get(i), Path1->Get(i+1)) != -1 && graph->ReturnEdges()->Get(graph->containsEdge(Path1->Get(i), Path1->Get(i+1)))->ReturnWeight() < weight)
+                    if (graph->containsEdge (graph->ReturnVertexes()->Get(Path1->Get(i))->ReturnName(), graph->ReturnVertexes()->Get(Path1->Get(i+1))->ReturnName()) != -1 && graph->ReturnEdges()->Get(graph->containsEdge(graph->ReturnVertexes()->Get(Path1->Get(i))->ReturnName(), graph->ReturnVertexes()->Get(Path1->Get(i+1))->ReturnName()))->ReturnWeight() < weight)
                     {
-                        weight = graph->ReturnEdges()->Get(graph->containsEdge(Path1->Get(i), Path1->Get(i+1)))->ReturnWeight();
+                        weight = graph->ReturnEdges()->Get(graph->containsEdge(graph->ReturnVertexes()->Get(Path1->Get(i))->ReturnName(), graph->ReturnVertexes()->Get(Path1->Get(i+1))->ReturnName()))->ReturnWeight();
                     }
-                    cout <<  Path1->Get(i) << "  --->  ";
+                    cout <<  graph->ReturnVertexes()->Get(Path1->Get(i))->ReturnName() << "  --->  ";
                 }
-                cout <<  Path1->Get(Path1->GetSize()-1) << endl;
+                cout <<  graph->ReturnVertexes()->Get(Path1->Get(Path1->GetSize()-1))->ReturnName() << endl;
                 cout <<  "The Weight is - " << weight << endl;
+                cout << endl;
+                DijString = graph->PathColorTostring(type, Path1, 1);
+                GraphPic(DijString);
             }
             break;
 
@@ -206,7 +239,7 @@ void Actions(int action, Graph<Name, Weight>* graph)
                     cout.width(3);
                     cout.setf(ios::left);
 
-                    if (matrix->GetElement(i, j) != 10000) {
+                    if (matrix->GetElement(i, j) != 1000000) {
                         cout << matrix->GetElement(i, j) << "  ";
                     }
                     else {
@@ -221,9 +254,29 @@ void Actions(int action, Graph<Name, Weight>* graph)
 
 void DirGraphMenu()
 {
+    int choice = 1e1;
+    int Vnum, Enum;
     Graph<char, int>* graph = new Graph<char, int>(compareT1);
+    while (choice == 1e1)
+    {
+        Random();
+        cin >> choice;
+    }
+    if (choice == 1)
+    {
+        cout << "Enter number of Vertexes: ";
+        cin >> Vnum;
+        cout << endl;
+        cout << "Enter number of Edges: ";
+        cin >> Enum;
+        cout << endl;
+        graph->RandomGraph(Vnum, Enum, 1);
+        string test = graph->Tostring(1);
+        GraphPic(test);
+    }
     while(true)
     {
+        graph->EdgeNumSort();
         cout << ("----------------------------------------------\n");
         ChooseAction();
         cout << ("6 <- Topological Sort") << endl;
@@ -244,11 +297,13 @@ void DirGraphMenu()
             {
                 cout << graph->ReturnVertexes()->Get(j)->ReturnName() << "  ";
             }
+            string TStr = graph->Tostring(1);
+            GraphPic(TStr);
             cout << endl;
         }
         else
         {
-            Actions(action, graph);
+            Actions(action, graph, 1);
         }    
     }
 
@@ -256,9 +311,29 @@ void DirGraphMenu()
 
 void UndirGraphMenu()
 {
+    int choice = 1e1;
+    int Vnum, Enum;
     UndGraph<char, int>* graph = new UndGraph<char, int>(compareT1);
+    while (choice == 1e1)
+    {
+        Random();
+        cin >> choice;
+    }
+    if (choice == 1)
+    {
+        cout << "Enter number of Vertexes: ";
+        cin >> Vnum;
+        cout << endl;
+        cout << "Enter number of Edges: ";
+        cin >> Enum;
+        cout << endl;
+        graph->RandomGraph(Vnum, Enum, 2);
+        string test = graph->Tostring(2);
+        GraphPic(test);
+    }
     while(true)
     {
+        graph->EdgeNumSort();
         cout << ("----------------------------------------------\n");
         ChooseAction();
         cout << ("6 <- Coloring") << endl;
@@ -274,16 +349,19 @@ void UndirGraphMenu()
         else if (action == 6)
         {
             cout << "Graph will be sorted based on the number of edges of vertex!" << endl;
-            ArraySequence<int> Colors = Coloring(graph, compareT1);
+            ArraySequence<int>* Colors = Coloring(graph, compareT1);
 
-            for (int i = 0; i < Colors.GetSize(); i += 1)
+            for (int i = 0; i < Colors->GetSize(); i += 1)
             {
-                cout << "Vertex: " << graph -> ReturnVertexes()->Get(i)->ReturnName() << " - Color #" << Colors.Get(i) << endl;
+                cout << "Vertex: " << graph -> ReturnVertexes()->Get(i)->ReturnName() << " - Color #" << Colors->Get(i) << endl;
             }
+            cout << endl;
+            string ColorStr = graph->PathColorTostring(2,Colors,2);
+            GraphPic(ColorStr);
         }
         else
         {
-            Actions(action, graph);
+            Actions(action, graph, 2);
         }    
     }
 }
